@@ -79,6 +79,10 @@ h2 {
   color: #035699;
 }
 
+svg {
+  border: 1px solid #000;
+}
+
 .sec-a,
 .sec-b {
   padding: 1rem;
