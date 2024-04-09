@@ -96,6 +96,12 @@ svg {
   background-color: #def5ff;
 }
 
+.canvas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 footer {
   background-color: #008ac1;
   color: #fff;
