@@ -80,6 +80,22 @@ const derryckChartA = () => {
         return y(d[0]) - y(d[1]);
       })
       .attr("width", x.bandwidth());
+    // .on("mouseover", function (event, d) {
+    //   console.log(d);
+    //   console.log(x(d.data.gender + " - " + d.data.race_ethnicity));
+    //   // Append a new text element with the score
+    //   svg
+    //     .append("text")
+    //     .attr("class", "scoreText")
+    //     .attr(
+    //       "x",
+    //       x((d) => d.data.gender + " - " + d.data.race_ethnicity) +
+    //         x.bandwidth() / 2
+    //     )
+    //     .attr("y", y(d[1]) - 5) // Adjust position as needed
+    //     .attr("text-anchor", "middle")
+    //     .text(d[1] - d[0]);
+    // });
 
     svg
       .append("g")
@@ -148,20 +164,21 @@ const derryckChartB = () => {
   d3.csv(
     "data/Ask_A_Manager_Salary Survey_2021 (Responses).csv",
     function (data) {
-      // Extract data and split age range to select lower bracket
-
       const ageData = data.map((d) => +d["How old are you?"].split("-")[0]);
       // remove quotes from salary data
       const salaryData = data.map(
         (d) => +d["What is your annual salary?"].replace(/,/g, "")
       );
 
-      // console.log(ageData);
-      // console.log(salaryData);
-
       const margin = { top: 50, right: 50, bottom: 50, left: 100 };
       const width = 900 - margin.left - margin.right;
       const height = 400 - margin.top - margin.bottom;
+
+      const tooltip = d3
+        .select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
       const svg = d3
         .select("#d-container2")
@@ -240,63 +257,106 @@ const derryckChartB = () => {
 //-------------------------
 const christinaChartA = () => {
   d3.csv("data/us_population_by_age.csv", function (data) {
-    console.log(data);
-    const margin = { top: 50, right: 50, bottom: 50, left: 100 };
-    const width = 900 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
-    // const height = Math.min(width, 500);
-    const radius = Math.min(width, height) / 2;
+    // console.log("data", data);
+    data.forEach(function (d) {
+      d.value = +d.value;
+    });
+
+    const margin = { top: 20, right: 50, bottom: 50, left: 10 };
+    var width = 1000,
+      height = 600,
+      radius = Math.min(width, height) / 2;
+
+    radius =
+      Math.min(
+        width - margin.left - margin.right,
+        height - margin.top - margin.bottom
+      ) / 2;
 
     const arc = d3
       .arc()
       .innerRadius(radius * 0.67)
       .outerRadius(radius - 1);
 
-    const pie = d3
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(
+      data.map(function (d) {
+        return d.name;
+      })
+    );
+
+    var pie = d3
       .pie()
-      .padAngle(1 / radius)
       .sort(null)
-      .value((d) => d.value);
+      .value(function (d) {
+        return d.value;
+      });
 
-    const color = d3
-      .scaleOrdinal()
-      .domain(data.map((d) => d.name))
-      .range(
-        d3
-          .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), data.length)
-          .reverse()
-      );
-
-    const svg = d3
+    var svg = d3
       .select("#c-container")
       .append("svg")
       .attr("width", width)
       .attr("height", height)
-      .attr("viewBox", [-width / 2, -height / 2, width, height])
-      .attr("style", "max-width: 100%; height: auto;");
+      .append("g")
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    svg.attr(
+      "transform",
+      "translate(" +
+        (width / 2 + margin.left) +
+        "," +
+        (height / 2 + margin.top) +
+        ")"
+    );
 
     svg
-      .append("g")
-      .selectAll()
-      .data(pie(data))
-      .join("path")
-      .attr("fill", (d) => color(d.data.name))
-      .attr("d", arc)
-      .append("title")
-      .text((d) => `${d.data.name}: ${d.data.value.toLocaleString()}`);
-
-    svg
-      .append("g")
-      .attr("font-family", "sans-serif")
-      .attr("font-size", 12)
+      .append("text")
+      .attr("x", 0)
+      .attr("y", -height / 2 + margin.top - 20)
       .attr("text-anchor", "middle")
-      .selectAll()
+      .style("font-size", "20px")
+      .style("text-decoration", "underline")
+      .text("US Population by Age");
+
+    const arcHover = d3
+      .arc()
+      .innerRadius(radius * 0.67)
+      .outerRadius(radius * 1.5);
+
+    var g = svg
+      .selectAll(".arc")
       .data(pie(data))
-      .join("text")
+      .enter()
+      .append("g")
+      .attr("class", "arc");
+
+    g.append("path")
+      .attr("d", arc)
+      .style("fill", function (d) {
+        return color(d.data.name);
+      })
+      .on("mouseover", function (event, d) {
+        d3.select(this).transition().duration(200).attr("d", arcHover);
+        d3.select(this.parentNode)
+          .select("text")
+          .transition()
+          .duration(200)
+          .attr("transform", (d) => `translate(${arcHover.centroid(d)})`);
+      })
+      .on("mouseout", function (event, d) {
+        d3.select(this).transition().duration(200).attr("d", arc);
+        d3.select(this.parentNode)
+          .select("text")
+          .transition()
+          .duration(200)
+          .attr("transform", (d) => `translate(${arc.centroid(d)})`);
+      });
+
+    g.append("text")
       .attr("transform", (d) => `translate(${arc.centroid(d)})`)
       .call((text) =>
         text
           .append("tspan")
+          .attr("x", "-0.9em")
           .attr("y", "-0.4em")
           .attr("font-weight", "bold")
           .text((d) => d.data.name)
@@ -305,15 +365,13 @@ const christinaChartA = () => {
         text
           .filter((d) => d.endAngle - d.startAngle > 0.25)
           .append("tspan")
-          .attr("x", 0)
+          .attr("x", "-1.9em")
           .attr("y", "0.7em")
           .attr("fill-opacity", 0.7)
           .text((d) => d.data.value.toLocaleString("en-US"))
       );
-
-    return svg.node();
   });
 };
-// christinaChartA();
+christinaChartA();
 derryckChartA();
 derryckChartB();
