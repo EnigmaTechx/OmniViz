@@ -100,6 +100,7 @@ svg {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 1rem;
 }
 
 .arc path {
@@ -117,6 +118,18 @@ svg {
   border: 0px;
   border-radius: 8px;
   pointer-events: none;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: rgb(115, 64, 254);
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font-family: sans-serif;
+  font-size: 12px;
 }
 
 footer {
