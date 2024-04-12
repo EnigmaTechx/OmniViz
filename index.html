@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/index.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
     <title>OmniViz</title>
   </head>
   <body>
@@ -34,15 +36,18 @@
       </section>
       <section class="sec-a" id="christina">
         <h2>Christina</h2>
-        <!-- TODO: draw graph -->
+        <div class="canvas" id="c-container"></div>
+        <div class="canvas" id="c-container2"></div>
       </section>
       <section class="sec-b" id="derryck">
         <h2>Derryck</h2>
-        <!-- TODO: draw graph -->
+        <div class="canvas" id="d-container"></div>
+        <div class="canvas" id="d-container2"></div>
       </section>
       <section class="sec-a" id="vijay">
         <h2>Vijayaraghavan</h2>
-        <!-- TODO: draw graph -->
+        <div class="canvas" id="v-container"></div>
+        <div class="canvas" id="v-container2"></div>
       </section>
       <section class="sec-b" id="kennedy">
         <h2>Kennedy</h2>
@@ -50,6 +55,8 @@
       </section>
     </main>
   </body>
+  <script src="js/index.js"></script>
+  <!-- <script src="js/derryck.js"></script> -->
   <footer>
     <p>&copy; 2024 Omni-Viz</p>
   </footer>
